@@ -1,0 +1,1 @@
+## experiments with scala3 and medeia without the need to make crosscompile work just yet
