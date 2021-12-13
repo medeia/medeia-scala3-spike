@@ -10,11 +10,9 @@ trait BsonDecoder[A]:
 
 object Instances:
   given BsonDecoder[String] with
-    def decode(bsonValue: BsonValue): Either[BsonDecoderError, String] = BsonDecoder.withType(BsonType.STRING)(_.asString().getValue)(bsonValue)
+    def decode(bsonValue: BsonValue): Either[BsonDecoderError, String] = withType(BsonType.STRING)(_.asString().getValue)(bsonValue)
 
-
-object BsonDecoder:
-  def withType[A](expectedType: BsonType)(f: BsonValue => A)(bson: BsonValue): Either[BsonDecoderError, A] =
+  private def withType[A](expectedType: BsonType)(f: BsonValue => A)(bson: BsonValue): Either[BsonDecoderError, A] =
     bson.getBsonType match
       case bsonType if bsonType == expectedType => Right(f(bson))
       case _              => Left(TypeMismatch(bson.getBsonType, expectedType))

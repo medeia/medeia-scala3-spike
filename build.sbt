@@ -10,6 +10,7 @@ lazy val root = project
 
     libraryDependencies ++= Vector(
       ("org.mongodb.scala" %% "mongo-scala-bson" % "4.4.0").cross(CrossVersion.for3Use2_13),
+      "org.typelevel" %% "shapeless3-deriving" % "3.0.4",
       "org.scalatest" %% "scalatest" % "3.2.10" % Test
     )
   )
