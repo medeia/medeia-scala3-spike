@@ -1,8 +1,8 @@
 package medeia.encoder
 
 import org.bson.BsonString
-import org.mongodb.scala.bson.BsonValue
-import shapeless3.deriving._
+import org.mongodb.scala.bson.{BsonDocument, BsonValue}
+import shapeless3.deriving.*
 
 trait BsonEncoder[A]:
   def encode(value: A): BsonValue
@@ -14,9 +14,13 @@ object BsonEncoder:
 
   given productEncoder[A](using inst: => K0.ProductInstances[BsonEncoder, A], labelling: Labelling[A]): BsonEncoder[A] with
     def encode(value: A): BsonValue =
-      print(labelling.label)
-      print(labelling.elemLabels)
-      BsonString(value.toString)
+      if(labelling.elemLabels.isEmpty)
+        BsonString(labelling.label.stripSuffix("$"))
+      else
+        BsonDocument(labelling.elemLabels.zipWithIndex.map(
+          (label, i) =>
+            label -> inst.project(value)(i)([t] => (encoder: BsonEncoder[t], pt: t) => encoder.encode(pt))
+        ))
 
   given coproductEncoder[A](using inst: => K0.CoproductInstances[BsonEncoder, A]): BsonEncoder[A] with
     def encode(value: A): BsonValue = BsonString(value.toString)
