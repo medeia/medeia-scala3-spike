@@ -20,3 +20,12 @@ class BsonEncoderTest extends AnyFlatSpec with Matchers:
 
     Foo("foo", Bar).toBson should ===(BsonDocument("a" -> "foo", "b" -> "Bar"))
   }
+
+  it should "encode sealed traits" in {
+    sealed trait T derives BsonEncoder
+    case class Foo(a: String) extends T derives BsonEncoder
+    case class Bar(x: String) extends T derives BsonEncoder
+
+    val t: T = Foo("s")
+    t.toBson should ===(BsonDocument("type" -> "Foo", "a" -> "s"))
+  }
